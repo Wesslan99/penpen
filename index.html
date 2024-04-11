@@ -53,6 +53,7 @@
     }
     canvas {
       max-width: 100%;
+      height: auto; /* Make the chart responsive */
     }
     .profile {
       margin-top: 20px;
@@ -74,7 +75,7 @@
 </head>
 <body>
   <div class="profile">
-    <img src="https://i.ibb.co/6tQLbYb/PXL-20240402-142919980-PORTRAIT.jpg" alt="Profile Picture">
+    <img src="https://i.ibb.co/M6WDJL8/284682065-3275521382717943-6295238433094071987.jpg" alt="Profile Picture">
     <h2>Pen-Pen</h2>
   </div>
   <h1>Follow</h1>
@@ -84,7 +85,7 @@
   </div>
   <div id="lastUpdate"></div>
   <div id="chartContainer">
-    <canvas id="myChart" width="400" height="200"></canvas> <!-- Chart.js canvas -->
+    <canvas id="myChart"></canvas> <!-- Chart.js canvas -->
   </div>
 
   <script>
