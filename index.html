@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pen-Pen</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js library -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background-color: #FFFFFF; /* Set the background color to white */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background-color 0.5s ease; /* Smooth transition for background color change */
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    #randomNumberContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    #randomNumber {
+      font-size: 36px;
+      color: #333;
+      background-color: #FAFAFA; /* Dexcom Follow app background color */
+      padding: 8px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #trendArrow {
+      margin-left: 10px;
+      font-size: 24px;
+      color: #333;
+    }
+    #lastUpdate {
+      font-style: italic;
+      color: #666;
+      font-size: 14px;
+    }
+    #chartContainer {
+      width: 80%; /* Set the width of the chart container */
+      margin-top: 20px; /* Adjust margin for spacing */
+    }
+    canvas {
+      max-width: 100%;
+    }
+    .profile {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .profile h2 {
+      margin-left: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile">
+    <img src="https://i.ibb.co/6tQLbYb/PXL-20240402-142919980-PORTRAIT.jpg" alt="Profile Picture">
+    <h2>Pen-Pen</h2>
+  </div>
+  <h1>Follow</h1>
+  <div id="randomNumberContainer">
+    <div id="randomNumber"></div>
+    <div id="trendArrow"></div>
+  </div>
+  <div id="lastUpdate"></div>
+  <div id="chartContainer">
+    <canvas id="myChart" width="400" height="200"></canvas> <!-- Chart.js canvas -->
+  </div>
+
+  <script>
+    // Function to generate a random number between 3.2 and 15.1
+    function generateRandomNumber() {
+      return (Math.random() * (15.1 - 3.2) + 3.2).toFixed(1);
+    }
+
+    // Function to update the random number display
+    function updateRandomNumber() {
+      var randomNumber = parseFloat(generateRandomNumber());
+      var trendArrow = document.getElementById('trendArrow');
+
+      // Get the previous random number
+      var prevRandomNumber = parseFloat(document.getElementById('randomNumber').innerText);
+      
+      // Update the trend arrow
+      if (randomNumber > prevRandomNumber) {
+        trendArrow.innerHTML = '&#8593;'; // Upward arrow
+      } else if (randomNumber < prevRandomNumber) {
+        trendArrow.innerHTML = '&#8595;'; // Downward arrow
+      } else {
+        trendArrow.innerHTML = '&#8594;'; // Horizontal arrow
+      }
+
+      // Update the random number display
+      document.getElementById('randomNumber').innerText = randomNumber;
+
+      // Change background color based on random number value
+      if (randomNumber < 3.9 || randomNumber > 13.8) {
+        document.body.style.backgroundColor = '#FF9787'; // Red background color
+      } else {
+        document.body.style.backgroundColor = '#ACE1AF'; // Green background color
+      }
+    }
+
+    // Function to update the last update time display
+    function updateLastUpdateTime() {
+      var lastUpdateElement = document.getElementById('lastUpdate');
+      var now = new Date();
+      var lastUpdate = new Date(localStorage.getItem('lastUpdate'));
+      var diff = Math.floor((now - lastUpdate) / (1000 * 60)); // Calculate difference in minutes
+      lastUpdateElement.innerText = 'Last updated: ' + diff + ' minutes ago';
+    }
+
+    // Initialize Chart.js
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'mmol/L',
+          data: [],
+          backgroundColor: 'rgba(255, 255, 255, 1)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 3
+        }]
+      },
+      options: {
+        scales: {
+          xAxes: [{
+            type: 'time',
+            time: {
+              unit: 'hour'
+            }
+          }],
+          yAxes: [{
+            ticks: {
+              beginAtZero: false
+            }
+          }]
+        },
+        legend: {
+          labels: {
+            fontColor: 'white' // Set legend font color to white
+          }
+        },
+        tooltips: {
+          bodyFontColor: 'white', // Set tooltip font color to white
+        }
+      }
+    });
+
+    // Function to update the chart with new data
+    function updateChart() {
+      var time = new Date();
+      var randomNumber = parseFloat(generateRandomNumber());
+      chart.data.labels.push(time);
+      chart.data.datasets[0].data.push(randomNumber);
+      chart.update();
+    }
+
+    // Initial update
+    updateRandomNumber();
+    updateChart();
+    updateLastUpdateTime();
+
+    // Populate the chart with initial data
+    for (var i = 0; i < 7; i++) {
+      updateChart();
+    }
+
+    // Update the random number, trend arrow, last update time, and chart every 5 minutes
+    setInterval(function() {
+      updateRandomNumber();
+      updateChart();
+      updateLastUpdateTime();
+    }, 60000*5);
+
+    // Update the last update time in local storage
+    localStorage.setItem('lastUpdate', new Date());
+  </script>
+</body>
+</html>
